@@ -4,8 +4,14 @@ import styles from "./page.module.css";
 import Input from "@/components/Input/Input";
 import { groupForecastByDay } from "@/utils/forecast";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ForecastChart from "@/components/ForecastChart/ForecastChart";
+import { backgroundStyles } from "@/utils/weatherBackground";
+import AnimatedBackground from "@/components/AnimatedBackground";
+import ForecastDayCard from "@/components/ForecastDayCard/ForecastDayCard";
+import AnimatedIcon from "@/components/AnimatedIcon";
+import HighlightedIcon from "@/components/HighlightedIcon/HighlightedIcon";
+import { AnimatePresence, motion, spring } from "motion/react";
 
 const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 if (!API_KEY) {
@@ -18,11 +24,27 @@ export default function Home() {
   const [groupedForecast, setGroupedForecast] = useState<any>(null);
   const [currentWeather, setCurrentWeather] = useState<any>(null);
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
+  const [dynamicBackground, setDynamicBackground] = useState<string>(
+    backgroundStyles.Default
+  );
+  const [isSearching, setIsSearching] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (selectedDayKey && groupedForecast) {
+      const weatherCondition =
+        groupedForecast[selectedDayKey][0].weather[0].main;
+      console.log(weatherCondition);
+      setDynamicBackground(
+        backgroundStyles[weatherCondition] || backgroundStyles.Default
+      );
+    } else {
+      setDynamicBackground(backgroundStyles.Default);
+    }
+  }, [selectedDayKey, groupedForecast]);
 
   const fetchWeather = async (lat: number, lon: number) => {
     try {
       setError(null);
-
       // Fetch the current weather from OpenWeatherMap API
       await axios
         .get(
@@ -53,20 +75,97 @@ export default function Home() {
           console.error("Error fetching weather forecast:", err);
           setError("Failed to fetch weather forecast. Please try again later.");
         });
+      setIsSearching(false);
     } catch (err: any) {
       setGroupedForecast(null);
       setError("Failed to fetch weather data. Please try again later.");
     }
   };
 
+  const handleEraseState = () => {
+    setCurrentWeather(null);
+    setGroupedForecast(null);
+    setSelectedDayKey(null);
+    setIsSearching(true);
+  };
+
   return (
-    <div className={styles.page}>
-      <h1>5-day weather</h1>
-      <Input fetchWeather={fetchWeather} />
-      {currentWeather && <CurrentWeatherCard weatherData={currentWeather} />}
-      {groupedForecast && selectedDayKey && (
-        <ForecastChart chartData={groupedForecast[selectedDayKey]} />
-      )}
-    </div>
+    <main>
+      <AnimatedBackground dynamicBackground={dynamicBackground} />
+      <AnimatePresence>
+        {isSearching && (
+          <motion.div
+            key="intro"
+            layout
+            initial={{ y: -100, opacity: 0 }}
+            animate={{
+              y: 0,
+              opacity: 1,
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+            }}
+            transition={{ type: "spring", bounce: 0.25 }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "2rem",
+              alignItems: "center",
+            }}
+          >
+            <AnimatedIcon>
+              <HighlightedIcon
+                src={`https://openweathermap.org/img/wn/10d@4x.png`}
+                alt="Animated weather icon"
+                blur={20}
+              />
+            </AnimatedIcon>
+            <div className={styles.titleWrapper}>
+              <h1>Weather</h1>
+              <h2>Forecast</h2>
+              <br />
+              <p>5 day weather forecast for any city in the world</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <motion.div
+        layout
+        initial={{ y: 30, opacity: 0 }}
+        animate={{
+          y: 0,
+          opacity: 1,
+        }}
+        transition={{ type: "spring", bounce: 0.25 }}
+      >
+        <Input
+          fetchWeather={fetchWeather}
+          handleEraseState={handleEraseState}
+          isSearching={isSearching}
+        />
+      </motion.div>
+
+      <motion.div
+        layout
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={spring}
+      >
+        {currentWeather && <CurrentWeatherCard weatherData={currentWeather} />}
+        {groupedForecast && selectedDayKey && (
+          <>
+            <ForecastChart chartData={groupedForecast[selectedDayKey]} />
+            <div className={styles.forecastContainer}>
+              {Object.keys(groupedForecast).map((dayKey) => (
+                <div key={dayKey} onClick={() => setSelectedDayKey(dayKey)}>
+                  <ForecastDayCard weatherData={groupedForecast[dayKey]} />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </motion.div>
+    </main>
   );
 }

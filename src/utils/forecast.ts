@@ -1,5 +1,4 @@
 interface ForecastItem {
-  dt_txt: string;
   [key: string]: any;
 }
 
@@ -34,8 +33,22 @@ export function groupForecastByDay(list: ForecastItem[]): GroupedForecast {
   }, {});
 }
 
-function getDailyAverage(list: ForecastItem[]) {
-  const temps = list.map((i) => i.main.temp);
+export function getAverageTemp(
+  list: ForecastItem[],
+  code: "avg" | "min" | "max"
+) {
+  const temps = list.map((dt) => {
+    switch (code) {
+      case "avg":
+        return dt.main.temp;
+      case "min":
+        return dt.main.temp_min;
+      case "max":
+        return dt.main.temp_max;
+      default:
+        return dt.main.temp;
+    }
+  });
   const avg = temps.reduce((sum, t) => sum + t, 0) / temps.length;
   return parseFloat(avg.toFixed(1));
 }

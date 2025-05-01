@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import styles from "./Input.module.css";
 import * as Yup from "yup";
 import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 type CityOption = {
   name: string;
@@ -16,20 +18,27 @@ type CityOption = {
 
 export default function Input({
   fetchWeather,
+  handleEraseState,
+  isSearching,
 }: {
   fetchWeather: (lat: number, lon: number) => void;
+  handleEraseState: () => void;
+  isSearching: boolean;
 }) {
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce(query, 800);
+  const debouncedQuery = useDebounce(query, 500);
   const [suggestions, setSuggestions] = useState<CityOption[]>([]);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
-      if (debouncedQuery.length < 3) return;
+      if (!debouncedQuery) {
+        setSuggestions([]);
+        return;
+      }
 
       try {
         const response = await axios.get(
-          `http://geodb-free-service.wirefreethought.com/v1/geo/places?namePrefix=${debouncedQuery}&limit=5&offset=0&sort=name&types=CITY`
+          `http://geodb-free-service.wirefreethought.com/v1/geo/places?namePrefix=${debouncedQuery}&limit=5&offset=0&types=CITY&sort=-name`
         );
         const data = response.data;
         console.log(data);
@@ -53,8 +62,7 @@ export default function Input({
     city: CityOption,
     setFieldValue: (field: string, value: any) => void
   ) => {
-    const label = `${city.name}, ${city.countryCode}`;
-    setFieldValue("city", label);
+    setFieldValue("city", city.name);
     setSuggestions([]);
     fetchWeather(city.lat, city.lon);
   };
@@ -67,43 +75,75 @@ export default function Input({
           city: Yup.string().required("City is required"),
         })}
         validateOnChange={true}
+        validateOnBlur={true}
         onSubmit={() => {}}
       >
-        {({ values, setFieldValue, handleBlur }) => (
-          <Form>
-            <label htmlFor="city">City</label>
-            <Field
-              id="city"
-              name="city"
-              value={values.city}
-              placeholder="Enter a city name"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setFieldValue("city", e.target.value);
-                setQuery(e.target.value);
-              }}
-              onBlur={handleBlur}
-            />
-            <ErrorMessage name="city" />
-            {suggestions.length > 0 && (
-              <ul
-                style={{
-                  background: "#fff",
-                  border: "1px solid #ccc",
-                  padding: "0.5rem",
+        {({
+          values,
+          errors,
+          touched,
+          setFieldValue,
+          handleBlur,
+          resetForm,
+        }) => (
+          <div className={styles.formWrapper}>
+            {!isSearching && (
+              <button
+                className={styles.backButton}
+                onClick={() => {
+                  resetForm();
+                  setSuggestions([]);
+                  handleEraseState(); // optionally notify parent
                 }}
               >
-                {suggestions.map((city, i) => (
-                  <li
-                    key={i}
-                    style={{ cursor: "pointer", padding: "0.25rem 0" }}
-                    onClick={() => handleSelect(city, setFieldValue)}
-                  >
-                    {city.name}, {city.countryCode}
-                  </li>
-                ))}
-              </ul>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
             )}
-          </Form>
+            <Form>
+              <Field
+                id="city"
+                name="city"
+                value={values.city}
+                placeholder="Enter a city name"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setFieldValue("city", e.target.value);
+                  setQuery(e.target.value);
+                }}
+                onBlur={handleBlur}
+                onFocus={() => {
+                  if (values.city) {
+                    setQuery(values.city);
+                  }
+                }}
+                className={styles.cityInput}
+                disabled={!isSearching}
+              />
+              {errors.city && touched.city && (
+                <div style={{ color: "red" }}>{errors.city}</div>
+              )}
+              {suggestions.length > 0 && (
+                <div>
+                  <ul
+                    style={{
+                      background: "#fff",
+                      border: "1px solid #ccc",
+                      padding: "0.5rem",
+                    }}
+                  >
+                    {suggestions.map((city, index) => (
+                      <li
+                        key={index}
+                        style={{ cursor: "pointer", padding: "0.25rem 0" }}
+                        onClick={() => handleSelect(city, setFieldValue)}
+                      >
+                        {city.name}, {city.countryCode}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </Form>
+          </div>
         )}
       </Formik>
     </div>

@@ -3,6 +3,7 @@ import styles from "./ForecastChart.module.css";
 import {
   CategoryScale,
   Chart as ChartJS,
+  Filler,
   Legend,
   LinearScale,
   LineElement,
@@ -19,7 +20,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 export const options = {
@@ -39,7 +41,7 @@ export const options = {
     },
     x: {
       ticks: {
-        display: false,
+        display: true,
       },
       grid: {
         display: false,
@@ -53,29 +55,21 @@ export const options = {
     legend: {
       display: false,
     },
-    label: {
-      display: true,
-    },
   },
 };
 
 export default function ForecastChart({ chartData }: { chartData: any }) {
-  console.log("Chart data:", chartData);
-
-  const labels = chartData.map((item: any) => {
-    const date = item.dt_txt.split(" ")[1]; // "HH:MM:SS"
-    return date.substring(0, 5); // "HH:MM"
-  });
-
   const data = {
-    labels,
+    labels: chartData.map((item: any) => {
+      const date = item.dt_txt.split(" ")[1]; // "HH:MM:SS"
+      return date.split(":")[0]; // "HH";
+    }),
     datasets: [
       {
-        borderColor: "rgba(153,207,0,1)",
-        borderWidth: 1,
-        pointRadius: 0,
-        data: chartData.map((item: any) => item.main.temp),
+        fill: true,
         tension: 0.5,
+        data: chartData.map((item: any) => item.main.temp),
+        pointRadius: 0,
         backgroundColor: (ctx) => {
           const canvas = ctx.chart.ctx;
           const gradient = canvas.createLinearGradient(
@@ -85,13 +79,11 @@ export default function ForecastChart({ chartData }: { chartData: any }) {
             ctx.chart.height
           );
 
-          gradient.addColorStop(0, "rgba(153,207,0,1)");
-          gradient.addColorStop(0.5, "rgba(153,207,0,0.5)");
-          gradient.addColorStop(1, "rgba(153,207,0,0)");
+          gradient.addColorStop(0, "rgba(255,255,255,1)");
+          gradient.addColorStop(1, "rgba(255,255,255,0)");
 
           return gradient;
         },
-        fill: true,
       },
     ],
   };
