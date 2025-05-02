@@ -1,6 +1,8 @@
 :root {
   --text: #ffffff;
   --text-contrast: #222222;
+  --error: rgb(195, 51, 51);
+  --error-rgb: 195, 51, 51;
 }
 
 html,

@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faWarning } from "@fortawesome/free-solid-svg-icons";
 
 type CityOption = {
   name: string;
@@ -72,7 +72,7 @@ export default function Input({
       <Formik
         initialValues={{ city: "" }}
         validationSchema={Yup.object({
-          city: Yup.string().required("City is required"),
+          city: Yup.string().required("City name required"),
         })}
         validateOnChange={true}
         validateOnBlur={true}
@@ -115,11 +115,18 @@ export default function Input({
                     setQuery(values.city);
                   }
                 }}
-                className={styles.cityInput}
+                className={`${styles.cityInput} ${
+                  errors.city && touched.city ? styles.errorInput : ""
+                }`}
                 disabled={!isSearching}
               />
               {errors.city && touched.city && (
-                <div style={{ color: "red" }}>{errors.city}</div>
+                <div className={styles.errorMessage}>
+                  <span>
+                    <FontAwesomeIcon icon={faWarning} />
+                  </span>{" "}
+                  {errors.city}
+                </div>
               )}
               {suggestions.length > 0 && (
                 <div>
