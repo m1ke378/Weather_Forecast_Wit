@@ -8,13 +8,20 @@ import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { AnimatePresence, motion } from "motion/react";
 
 type CityOption = {
   name: string;
   countryCode: string;
+  state: string | null;
   lat: number;
   lon: number;
 };
+
+const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+if (!API_KEY) {
+  throw new Error("API key is not defined.");
+}
 
 export default function Input({
   fetchWeather,
@@ -38,15 +45,15 @@ export default function Input({
 
       try {
         const response = await axios.get(
-          `http://geodb-free-service.wirefreethought.com/v1/geo/places?namePrefix=${debouncedQuery}&limit=5&offset=0&types=CITY&sort=-name`
+          `https://api.openweathermap.org/geo/1.0/direct?q=${debouncedQuery}&limit=5&appid=${API_KEY}`
         );
         const data = response.data;
-        console.log(data);
-        const cities = data.data.map((item: any) => ({
+        const cities = data.map((item: any) => ({
           name: item.name,
-          countryCode: item.countryCode,
-          lat: item.latitude,
-          lon: item.longitude,
+          countryCode: item.country,
+          state: item.state || null,
+          lat: item.lat,
+          lon: item.lon,
         }));
         setSuggestions(cities);
       } catch (error) {
@@ -62,8 +69,12 @@ export default function Input({
     city: CityOption,
     setFieldValue: (field: string, value: any) => void
   ) => {
-    setFieldValue("city", city.name);
+    setFieldValue(
+      "city",
+      `${city.name}, ${city.countryCode}${city.state ? `, ${city.state}` : ""}`
+    );
     setSuggestions([]);
+    setQuery("");
     fetchWeather(city.lat, city.lon);
   };
 
@@ -128,27 +139,36 @@ export default function Input({
                   {errors.city}
                 </div>
               )}
-              {suggestions.length > 0 && (
-                <div>
-                  <ul
-                    style={{
-                      background: "#fff",
-                      border: "1px solid #ccc",
-                      padding: "0.5rem",
+              <AnimatePresence>
+                {suggestions.length > 0 && (
+                  <motion.div
+                    layout
+                    key="dropdown"
+                    initial={{ translateY: -30, opacity: 0, height: 0 }}
+                    animate={{
+                      translateY: 0,
+                      opacity: 1,
+                      height: "fit-content",
                     }}
+                    exit={{ translateY: 30, opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={styles.dropdown}
                   >
-                    {suggestions.map((city, index) => (
-                      <li
-                        key={index}
-                        style={{ cursor: "pointer", padding: "0.25rem 0" }}
-                        onClick={() => handleSelect(city, setFieldValue)}
-                      >
-                        {city.name}, {city.countryCode}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                    <ul>
+                      {suggestions.map((city, index) => (
+                        <li
+                          key={index}
+                          onClick={() => handleSelect(city, setFieldValue)}
+                        >
+                          {`${city.name}, ${city.countryCode}${
+                            city.state ? `, ${city.state}` : ""
+                          }`}
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Form>
           </div>
         )}

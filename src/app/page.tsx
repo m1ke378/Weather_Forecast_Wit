@@ -11,7 +11,7 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 import ForecastDayCard from "@/components/ForecastDayCard/ForecastDayCard";
 import AnimatedIcon from "@/components/AnimatedIcon";
 import HighlightedIcon from "@/components/HighlightedIcon/HighlightedIcon";
-import { AnimatePresence, motion, spring } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 if (!API_KEY) {
@@ -20,7 +20,6 @@ if (!API_KEY) {
 
 export default function Home() {
   const [unit, setUnit] = useState<"metric" | "imperial">("metric");
-  const [error, setError] = useState<string | null>(null);
   const [groupedForecast, setGroupedForecast] = useState<any>(null);
   const [currentWeather, setCurrentWeather] = useState<any>(null);
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
@@ -33,7 +32,7 @@ export default function Home() {
     if (selectedDayKey && groupedForecast) {
       const weatherCondition =
         groupedForecast[selectedDayKey][0].weather[0].main;
-      console.log(weatherCondition);
+      console.log("Changing background to: ", weatherCondition);
       setDynamicBackground(
         backgroundStyles[weatherCondition] || backgroundStyles.Default
       );
@@ -43,43 +42,41 @@ export default function Home() {
   }, [selectedDayKey, groupedForecast]);
 
   const fetchWeather = async (lat: number, lon: number) => {
-    try {
-      setError(null);
-      // Fetch the current weather from OpenWeatherMap API
-      await axios
-        .get(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
-        )
-        .then((res) => {
-          console.log(res.data);
-          setCurrentWeather(res.data);
-        })
-        .catch((err) => {
-          console.error("Error fetching current weather:", err);
-          setError("Failed to fetch current weather. Please try again later.");
-        });
+    // Fetch the current weather from OpenWeatherMap API
+    await axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
+      )
+      .then((res) => {
+        console.log("Current Weather data: ", res.data);
+        setCurrentWeather(res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching current weather:", err.message);
+        throw new Error(
+          "Failed to fetch current weather. Please try again later."
+        );
+      });
 
-      // Fetch the weather forecats from OpenWeatherMap API
-      await axios
-        .get(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
-        )
-        .then((res) => {
-          const groupedData = groupForecastByDay(res.data.list);
-          setGroupedForecast(groupedData);
-          const firstKey = Object.keys(groupedData)[0];
-          setSelectedDayKey(firstKey);
-          console.log(groupedData);
-        })
-        .catch((err) => {
-          console.error("Error fetching weather forecast:", err);
-          setError("Failed to fetch weather forecast. Please try again later.");
-        });
-      setIsSearching(false);
-    } catch (err: any) {
-      setGroupedForecast(null);
-      setError("Failed to fetch weather data. Please try again later.");
-    }
+    // Fetch the weather forecats from OpenWeatherMap API
+    await axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
+      )
+      .then((res) => {
+        const groupedData = groupForecastByDay(res.data.list);
+        setGroupedForecast(groupedData);
+        const firstKey = Object.keys(groupedData)[0];
+        setSelectedDayKey(firstKey);
+        console.log("Grouped data: ", groupedData);
+      })
+      .catch((err) => {
+        console.error("Error fetching weather forecast:", err.message);
+        throw new Error(
+          "Failed to fetch weather forecast. Please try again later."
+        );
+      });
+    setIsSearching(false);
   };
 
   const handleEraseState = () => {
@@ -162,12 +159,12 @@ export default function Home() {
             <ForecastChart chartData={groupedForecast[selectedDayKey]} />
             <div className={styles.forecastContainer}>
               {Object.keys(groupedForecast).map((dayKey) => {
-                console.log(dayKey);
                 return (
                   <ForecastDayCard
                     key={dayKey}
                     weatherData={groupedForecast[dayKey]}
                     onClick={() => setSelectedDayKey(dayKey)}
+                    selected={selectedDayKey === dayKey}
                   />
                 );
               })}
