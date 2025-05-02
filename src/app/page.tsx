@@ -97,17 +97,12 @@ export default function Home() {
           <motion.div
             key="intro"
             layout
-            initial={{ y: -100, opacity: 0 }}
-            animate={{
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              height: 0,
-              opacity: 0,
-            }}
-            transition={{ type: "spring", bounce: 0.25 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95, height: 0 }}
+            transition={{ duration: 0.3 }}
             style={{
+              overflow: "hidden",
               display: "flex",
               flexDirection: "column",
               gap: "2rem",
@@ -138,7 +133,7 @@ export default function Home() {
           y: 0,
           opacity: 1,
         }}
-        transition={{ type: "spring", bounce: 0.25 }}
+        transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
       >
         <Input
           fetchWeather={fetchWeather}
@@ -148,10 +143,9 @@ export default function Home() {
       </motion.div>
 
       <motion.div
-        layout
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={spring}
+        transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
         style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
       >
         {currentWeather && (
