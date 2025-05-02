@@ -12,6 +12,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(
   CategoryScale,
@@ -21,7 +22,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  ChartDataLabels
 );
 
 export const options = {
@@ -30,7 +32,7 @@ export const options = {
   scales: {
     y: {
       ticks: {
-        display: true,
+        display: false,
       },
       grid: {
         display: false,
@@ -42,6 +44,7 @@ export const options = {
     x: {
       ticks: {
         display: true,
+        color: "#ffffff",
       },
       grid: {
         display: false,
@@ -54,6 +57,16 @@ export const options = {
   plugins: {
     legend: {
       display: false,
+    },
+    datalabels: {
+      color: "#222222",
+      font: {
+        weight: "bold" as "bold",
+      },
+      formatter: Math.round,
+      padding: 4,
+      backgroundColor: "rgba(255,255,255,1)",
+      borderRadius: 4,
     },
   },
 };
@@ -70,7 +83,7 @@ export default function ForecastChart({ chartData }: { chartData: any }) {
         tension: 0.5,
         data: chartData.map((item: any) => item.main.temp),
         pointRadius: 0,
-        backgroundColor: (ctx) => {
+        backgroundColor: (ctx: any) => {
           const canvas = ctx.chart.ctx;
           const gradient = canvas.createLinearGradient(
             0,
@@ -89,9 +102,7 @@ export default function ForecastChart({ chartData }: { chartData: any }) {
   };
   return (
     <div>
-      <h2>Forecast Chart</h2>
-      <p>Chart will be displayed here.</p>
-      <Line options={options} data={data} />
+      <Line options={options} data={data} plugins={[ChartDataLabels]} />
     </div>
   );
 }

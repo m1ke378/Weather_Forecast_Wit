@@ -25,7 +25,7 @@ export default function CurrentWeatherCard({
   unit,
 }: {
   weatherData: WeatherData;
-  unit: "F" | "C";
+  unit: "metric" | "imperial";
 }) {
   const weekDay = weekdays[new Date(weatherData.dt).getDay()];
   const description =
@@ -59,7 +59,7 @@ export default function CurrentWeatherCard({
             <span style={{ fontSize: "50px", fontWeight: "600" }}>
               {Math.round(weatherData.main.temp)}
             </span>
-            <span>{unit === "C" ? "°C" : "°F"}</span>
+            <span>{unit === "metric" ? "°C" : "°F"}</span>
           </div>
         </div>
         <div

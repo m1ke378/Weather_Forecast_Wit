@@ -119,6 +119,7 @@ export default function Home() {
                 src={`https://openweathermap.org/img/wn/10d@4x.png`}
                 alt="Animated weather icon"
                 blur={20}
+                height={200}
               />
             </AnimatedIcon>
             <div className={styles.titleWrapper}>
@@ -151,8 +152,11 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={spring}
+        style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
       >
-        {currentWeather && <CurrentWeatherCard weatherData={currentWeather} />}
+        {currentWeather && (
+          <CurrentWeatherCard weatherData={currentWeather} unit={unit} />
+        )}
         {groupedForecast && selectedDayKey && (
           <>
             <ForecastChart chartData={groupedForecast[selectedDayKey]} />
