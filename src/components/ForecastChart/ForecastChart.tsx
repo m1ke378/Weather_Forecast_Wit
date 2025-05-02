@@ -75,7 +75,7 @@ export default function ForecastChart({ chartData }: { chartData: any }) {
   const data = {
     labels: chartData.map((item: any) => {
       const date = item.dt_txt.split(" ")[1]; // "HH:MM:SS"
-      return date.split(":")[0]; // "HH";
+      return date.split(":")[0] + "h"; // "HH";
     }),
     datasets: [
       {
@@ -102,7 +102,12 @@ export default function ForecastChart({ chartData }: { chartData: any }) {
   };
   return (
     <div>
-      <Line options={options} data={data} plugins={[ChartDataLabels]} />
+      <Line
+        options={options}
+        data={data}
+        plugins={[ChartDataLabels]}
+        style={{ width: "100%", height: "auto" }}
+      />
     </div>
   );
 }

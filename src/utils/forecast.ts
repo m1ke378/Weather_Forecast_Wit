@@ -33,6 +33,20 @@ export function groupForecastByDay(list: ForecastItem[]): GroupedForecast {
   }, {});
 }
 
+const weekdays = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+export function getWeekday(dayNumber: number): string {
+  return weekdays[dayNumber];
+}
+
 export function getAverageTemp(
   list: ForecastItem[],
   code: "avg" | "min" | "max"

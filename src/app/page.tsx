@@ -146,7 +146,13 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
-        style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "2rem",
+          width: "90vw",
+          maxWidth: "500px",
+        }}
       >
         {currentWeather && (
           <CurrentWeatherCard weatherData={currentWeather} unit={unit} />
@@ -155,11 +161,16 @@ export default function Home() {
           <>
             <ForecastChart chartData={groupedForecast[selectedDayKey]} />
             <div className={styles.forecastContainer}>
-              {Object.keys(groupedForecast).map((dayKey) => (
-                <div key={dayKey} onClick={() => setSelectedDayKey(dayKey)}>
-                  <ForecastDayCard weatherData={groupedForecast[dayKey]} />
-                </div>
-              ))}
+              {Object.keys(groupedForecast).map((dayKey) => {
+                console.log(dayKey);
+                return (
+                  <ForecastDayCard
+                    key={dayKey}
+                    weatherData={groupedForecast[dayKey]}
+                    onClick={() => setSelectedDayKey(dayKey)}
+                  />
+                );
+              })}
             </div>
           </>
         )}

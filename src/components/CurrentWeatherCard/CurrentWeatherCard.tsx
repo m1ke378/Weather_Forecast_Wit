@@ -1,4 +1,3 @@
-import Image from "next/image";
 import styles from "./CurrentWeatherCard.module.css";
 import { WeatherData } from "@/utils/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,16 +8,7 @@ import {
   faEye,
   faWind,
 } from "@fortawesome/free-solid-svg-icons";
-
-const weekdays = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+import { getWeekday } from "@/utils/forecast";
 
 export default function CurrentWeatherCard({
   weatherData,
@@ -27,7 +17,7 @@ export default function CurrentWeatherCard({
   weatherData: WeatherData;
   unit: "metric" | "imperial";
 }) {
-  const weekDay = weekdays[new Date(weatherData.dt).getDay()];
+  const weekday = getWeekday(new Date(weatherData.dt * 1000).getDay());
   const description =
     weatherData.weather[0].description.charAt(0).toUpperCase() +
     weatherData.weather[0].description.slice(1);
@@ -71,14 +61,14 @@ export default function CurrentWeatherCard({
             paddingRight: ".8rem",
           }}
         >
-          <h3>{weekDay}</h3>
+          <h3>{weekday}</h3>
           <div>{description}</div>
         </div>
       </div>
       <div
         style={{
           display: "flex",
-          gap: "2rem",
+          gap: ".8rem",
           justifyContent: "space-between",
           paddingInline: "1rem",
         }}
@@ -86,7 +76,7 @@ export default function CurrentWeatherCard({
         <div
           style={{
             display: "flex",
-            gap: ".8rem",
+            gap: ".5rem",
           }}
         >
           <FontAwesomeIcon icon={faWind} />
@@ -101,7 +91,7 @@ export default function CurrentWeatherCard({
         <div
           style={{
             display: "flex",
-            gap: ".8rem",
+            gap: ".5rem",
           }}
         >
           <FontAwesomeIcon icon={faCloud} />
@@ -110,7 +100,7 @@ export default function CurrentWeatherCard({
         <div
           style={{
             display: "flex",
-            gap: ".8rem",
+            gap: ".5rem",
           }}
         >
           <FontAwesomeIcon icon={faEye} />
