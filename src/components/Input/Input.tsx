@@ -111,26 +111,66 @@ export default function Input({
               </button>
             )}
             <Form>
-              <Field
-                id="city"
-                name="city"
-                value={values.city}
-                placeholder="Enter a city name"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setFieldValue("city", e.target.value);
-                  setQuery(e.target.value);
-                }}
-                onBlur={handleBlur}
-                onFocus={() => {
-                  if (values.city) {
-                    setQuery(values.city);
-                  }
-                }}
-                className={`${styles.cityInput} ${
+              <div
+                className={`${styles.cityInputWrapper} ${
                   errors.city && touched.city ? styles.errorInput : ""
-                }`}
-                disabled={!isSearching}
-              />
+                } ${!isSearching ? styles.cityInputWrapperDisabled : ""}`}
+              >
+                <Field
+                  id="city"
+                  name="city"
+                  value={values.city}
+                  placeholder="Enter a city name"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setFieldValue("city", e.target.value);
+                    setQuery(e.target.value);
+                  }}
+                  onBlur={handleBlur}
+                  onFocus={() => {
+                    if (values.city) {
+                      setQuery(values.city);
+                    }
+                  }}
+                  className={styles.cityInput}
+                  style={{
+                    borderBottom:
+                      suggestions.length > 0 && query.length > 0
+                        ? "solid 1px rgba(255, 255, 255, 0.5)"
+                        : "none",
+                  }}
+                  disabled={!isSearching}
+                />
+                <AnimatePresence>
+                  {suggestions.length > 0 && query.length > 0 && (
+                    <motion.div
+                      layout
+                      key="dropdown"
+                      initial={{ translateY: -30, opacity: 0, height: 0 }}
+                      animate={{
+                        translateY: 0,
+                        opacity: 1,
+                        height: "fit-content",
+                      }}
+                      exit={{ translateY: 30, opacity: 0, height: 0 }}
+                      transition={{ duration: 0.1 }}
+                      className={styles.dropdown}
+                    >
+                      <ul>
+                        {suggestions.map((city, index) => (
+                          <li
+                            key={index}
+                            onClick={() => handleSelect(city, setFieldValue)}
+                          >
+                            {`${city.name}, ${city.countryCode}${
+                              city.state ? `, ${city.state}` : ""
+                            }`}
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               {errors.city && touched.city && (
                 <div className={styles.errorMessage}>
                   <span>
@@ -139,36 +179,6 @@ export default function Input({
                   {errors.city}
                 </div>
               )}
-              <AnimatePresence>
-                {suggestions.length > 0 && (
-                  <motion.div
-                    layout
-                    key="dropdown"
-                    initial={{ translateY: -30, opacity: 0, height: 0 }}
-                    animate={{
-                      translateY: 0,
-                      opacity: 1,
-                      height: "fit-content",
-                    }}
-                    exit={{ translateY: 30, opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={styles.dropdown}
-                  >
-                    <ul>
-                      {suggestions.map((city, index) => (
-                        <li
-                          key={index}
-                          onClick={() => handleSelect(city, setFieldValue)}
-                        >
-                          {`${city.name}, ${city.countryCode}${
-                            city.state ? `, ${city.state}` : ""
-                          }`}
-                        </li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </Form>
           </div>
         )}

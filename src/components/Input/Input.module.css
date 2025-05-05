@@ -2,35 +2,44 @@
   position: relative;
 }
 
-.cityInput {
-  height: 2rem;
+.cityInputWrapper {
   width: 90vw;
   max-width: 500px;
-  outline: none;
-  border: solid 2px rgba(255, 239, 149, 0.6);
-  background-color: rgba(255, 221, 98, 0.2);
+  border: solid 2px rgb(197, 166, 120);
+  background-color: rgba(197, 166, 120, 0.5);
   color: var(--text);
   border-radius: 2rem;
-  padding: 2rem;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline: 1rem;
+}
+
+.cityInput {
+  text-align: center;
+  background: transparent;
+  border-color: transparent;
+  outline: none;
   font-size: 16px;
   font-weight: 600;
-  position: relative;
-  text-align: center;
-  transition: all 0.3s ease-in-out;
+  color: var(--text);
+  width: 100%;
+  padding: 1rem;
 }
 
 .cityInput::placeholder {
   color: var(--text);
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
-.cityInput:disabled {
-  padding: 1.5rem;
+.cityInputWrapperDisabled {
   background-color: transparent;
   border: solid 2px transparent;
 }
 
-.cityInput.errorInput {
+.cityInputWrapper.errorInput {
   border: solid 2px var(--error);
   background-color: rgba(var(--error-rgb), 0.2);
 }
@@ -40,8 +49,6 @@
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 40px;
-  width: 40px;
   border-radius: 40px;
   z-index: 1;
 }
@@ -53,11 +60,10 @@
 }
 
 .dropdown {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 30px;
-  margin-top: 2rem;
-  padding: 1.5rem 0;
+  width: 100%;
   overflow-y: hidden;
+  flex: 1;
+  margin-block: 1rem;
 }
 
 .dropdown ul {
@@ -65,9 +71,13 @@
 }
 
 .dropdown li {
-  padding: 0.8rem 2rem;
+  padding: 1rem 2rem;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+}
+
+.dropdown li:last-child {
+  border-radius: 0 0 20px 20px;
 }
 
 .dropdown li:hover {
