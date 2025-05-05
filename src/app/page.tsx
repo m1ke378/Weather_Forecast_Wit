@@ -12,7 +12,6 @@ import ForecastDayCard from "@/components/ForecastDayCard/ForecastDayCard";
 import AnimatedIcon from "@/components/AnimatedIcon";
 import HighlightedIcon from "@/components/HighlightedIcon/HighlightedIcon";
 import { AnimatePresence, motion } from "motion/react";
-import Card from "@/components/Card/Card";
 
 const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 if (!API_KEY) {
