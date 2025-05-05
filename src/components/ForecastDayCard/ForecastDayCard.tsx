@@ -12,6 +12,7 @@ export default function ForecastDayCard({
   selected: boolean;
 }) {
   console.log("Day card data: ", weatherData);
+  console.log("Icon Index: ", Math.round(weatherData.length / 2) - 1);
   const weekday = getWeekday(
     new Date(weatherData[0].dt * 1000).getDay()
   ).substring(0, 3);
@@ -23,9 +24,12 @@ export default function ForecastDayCard({
       <h4>{weekday}</h4>
       <img
         src={`https://openweathermap.org/img/wn/${weatherData[
-          weatherData.length / 2
+          Math.round(weatherData.length / 2) - 1
         ].weather[0].icon.substring(0, 2)}d.png`}
-        alt={weatherData[weatherData.length / 2].weather[0].description}
+        alt={
+          weatherData[Math.round(weatherData.length / 2) - 1].weather[0]
+            .description
+        }
       />
       <div
         style={{
