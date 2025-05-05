@@ -66,3 +66,35 @@ export function getAverageTemp(
   const avg = temps.reduce((sum, t) => sum + t, 0) / temps.length;
   return parseFloat(avg.toFixed(1));
 }
+
+/**
+ * getAverageDayCondition returns the avg weather for a given day based on the 8 entries available.
+ *
+ *
+ * @param dayForecast - The list of entries for a given day
+ * @returns - The avg value (Clouds, Rain, Clear, etc...)
+ *
+ */
+
+export function getAverageDayCondition(dayForecast: ForecastItem[]) {
+  const counts: Record<string, number> = {};
+
+  for (const entry of dayForecast) {
+    const condition = entry.weather?.[0]?.main;
+    if (condition) {
+      counts[condition] = (counts[condition] || 0) + 1;
+    }
+  }
+
+  let maxCondition = null;
+  let maxCount = 0;
+
+  for (const condition in counts) {
+    if (counts[condition] > maxCount) {
+      maxCondition = condition;
+      maxCount = counts[condition];
+    }
+  }
+
+  return maxCondition || "Unknown";
+}
