@@ -2,7 +2,7 @@
 import CurrentWeatherCard from "@/components/CurrentWeatherCard/CurrentWeatherCard";
 import styles from "./page.module.css";
 import Input from "@/components/Input/Input";
-import { groupForecastByDay } from "@/utils/forecast";
+import { getAverageDayCondition, groupForecastByDay } from "@/utils/forecast";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import ForecastChart from "@/components/ForecastChart/ForecastChart";
@@ -12,6 +12,7 @@ import ForecastDayCard from "@/components/ForecastDayCard/ForecastDayCard";
 import AnimatedIcon from "@/components/AnimatedIcon";
 import HighlightedIcon from "@/components/HighlightedIcon/HighlightedIcon";
 import { AnimatePresence, motion } from "motion/react";
+import Card from "@/components/Card/Card";
 
 const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 if (!API_KEY) {
@@ -30,8 +31,10 @@ export default function Home() {
 
   useEffect(() => {
     if (selectedDayKey && groupedForecast) {
-      const weatherCondition =
-        groupedForecast[selectedDayKey][0].weather[0].main;
+      const weatherCondition = getAverageDayCondition(
+        groupedForecast[selectedDayKey]
+      );
+
       console.log("Changing background to: ", weatherCondition);
       setDynamicBackground(
         backgroundStyles[weatherCondition] || backgroundStyles.Default
