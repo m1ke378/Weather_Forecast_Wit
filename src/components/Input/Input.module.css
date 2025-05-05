@@ -36,7 +36,6 @@
 }
 
 .backButton {
-  color: var(--text-contrast);
   position: absolute;
   left: 0;
   top: 50%;
@@ -44,23 +43,7 @@
   height: 40px;
   width: 40px;
   border-radius: 40px;
-  background-color: rgba(255, 255, 255, 0.2);
   z-index: 1;
-  outline: none;
-  border: none;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-  border: solid 1px transparent;
-}
-
-.backButton:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-  scale: 1.06;
-}
-
-.backButton:active {
-  border: solid 1px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 0 7px rgba(0, 0, 0, 0.3);
 }
 
 .errorMessage {
