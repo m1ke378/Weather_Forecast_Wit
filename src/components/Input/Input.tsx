@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { faWarning } from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence, motion } from "motion/react";
 
 type CityOption = {
@@ -25,11 +25,9 @@ if (!API_KEY) {
 
 export default function Input({
   fetchWeather,
-  handleEraseState,
   isSearching,
 }: {
   fetchWeather: (lat: number, lon: number) => void;
-  handleEraseState: () => void;
   isSearching: boolean;
 }) {
   const [query, setQuery] = useState("");
@@ -79,110 +77,90 @@ export default function Input({
   };
 
   return (
-    <div>
-      <Formik
-        initialValues={{ city: "" }}
-        validationSchema={Yup.object({
-          city: Yup.string().required("City name required"),
-        })}
-        validateOnChange={true}
-        validateOnBlur={true}
-        onSubmit={() => {}}
-      >
-        {({
-          values,
-          errors,
-          touched,
-          setFieldValue,
-          handleBlur,
-          resetForm,
-        }) => (
-          <div className={styles.formWrapper}>
-            {!isSearching && (
-              <button
-                className={styles.backButton}
-                onClick={() => {
-                  resetForm();
-                  setSuggestions([]);
-                  handleEraseState(); // optionally notify parent
-                }}
-              >
-                <FontAwesomeIcon icon={faArrowLeft} />
-              </button>
-            )}
-            <Form>
-              <div
-                className={`${styles.cityInputWrapper} ${
-                  errors.city && touched.city ? styles.errorInput : ""
-                } ${!isSearching ? styles.cityInputWrapperDisabled : ""}`}
-              >
-                <Field
-                  id="city"
-                  name="city"
-                  value={values.city}
-                  placeholder="Enter a city name"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setFieldValue("city", e.target.value);
-                    setQuery(e.target.value);
+    <Formik
+      initialValues={{ city: "" }}
+      validationSchema={Yup.object({
+        city: Yup.string().required("City name required"),
+      })}
+      validateOnChange={true}
+      validateOnBlur={true}
+      onSubmit={() => {}}
+    >
+      {({ values, errors, touched, setFieldValue, handleBlur, resetForm }) => (
+        <Form>
+          <div
+            className={`${styles.cityInputWrapper} ${
+              errors.city && touched.city ? styles.errorInput : ""
+            } ${!isSearching ? styles.cityInputWrapperDisabled : ""}`}
+          >
+            <Field
+              id="city"
+              name="city"
+              value={values.city}
+              placeholder="Enter a city name"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setFieldValue("city", e.target.value);
+                setQuery(e.target.value);
+              }}
+              onBlur={handleBlur}
+              onFocus={() => {
+                if (values.city) {
+                  setQuery(values.city);
+                }
+              }}
+              className={styles.cityInput}
+              style={{
+                borderBottom:
+                  suggestions.length > 0 && query.length > 0
+                    ? "solid 1px rgba(255, 255, 255, 0.5)"
+                    : "none",
+              }}
+              disabled={!isSearching}
+            />
+            <AnimatePresence>
+              {suggestions.length > 0 && query.length > 0 && (
+                <motion.div
+                  layout
+                  key="dropdown"
+                  initial={{ translateY: -30, opacity: 0, height: 0 }}
+                  animate={{
+                    translateY: 0,
+                    opacity: 1,
+                    height: "fit-content",
                   }}
-                  onBlur={handleBlur}
-                  onFocus={() => {
-                    if (values.city) {
-                      setQuery(values.city);
-                    }
-                  }}
-                  className={styles.cityInput}
-                  style={{
-                    borderBottom:
-                      suggestions.length > 0 && query.length > 0
-                        ? "solid 1px rgba(255, 255, 255, 0.5)"
-                        : "none",
-                  }}
-                  disabled={!isSearching}
-                />
-                <AnimatePresence>
-                  {suggestions.length > 0 && query.length > 0 && (
-                    <motion.div
-                      layout
-                      key="dropdown"
-                      initial={{ translateY: -30, opacity: 0, height: 0 }}
-                      animate={{
-                        translateY: 0,
-                        opacity: 1,
-                        height: "fit-content",
-                      }}
-                      exit={{ translateY: 30, opacity: 0, height: 0 }}
-                      transition={{ duration: 0.1 }}
-                      className={styles.dropdown}
-                    >
-                      <ul>
-                        {suggestions.map((city, index) => (
-                          <li
-                            key={index}
-                            onClick={() => handleSelect(city, setFieldValue)}
-                          >
-                            {`${city.name}, ${city.countryCode}${
-                              city.state ? `, ${city.state}` : ""
-                            }`}
-                          </li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              {errors.city && touched.city && (
-                <div className={styles.errorMessage}>
-                  <span>
-                    <FontAwesomeIcon icon={faWarning} />
-                  </span>{" "}
-                  {errors.city}
-                </div>
+                  exit={{ translateY: 30, opacity: 0, height: 0 }}
+                  transition={{ duration: 0.1 }}
+                  className={styles.dropdown}
+                >
+                  <ul>
+                    {suggestions.map((city, index) => (
+                      <li
+                        key={index}
+                        onClick={() => {
+                          resetForm();
+                          handleSelect(city, setFieldValue);
+                        }}
+                      >
+                        {`${city.name}, ${city.countryCode}${
+                          city.state ? `, ${city.state}` : ""
+                        }`}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
               )}
-            </Form>
+            </AnimatePresence>
           </div>
-        )}
-      </Formik>
-    </div>
+          {errors.city && touched.city && (
+            <div className={styles.errorMessage}>
+              <span>
+                <FontAwesomeIcon icon={faWarning} />
+              </span>{" "}
+              {errors.city}
+            </div>
+          )}
+        </Form>
+      )}
+    </Formik>
   );
 }

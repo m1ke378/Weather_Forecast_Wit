@@ -1,10 +1,7 @@
-.formWrapper {
-  position: relative;
-}
-
 .cityInputWrapper {
   width: 90vw;
-  max-width: 500px;
+  max-width: var(--max-width);
+  min-width: var(--min-width);
   border: solid 2px rgb(197, 166, 120);
   background-color: rgba(197, 166, 120, 0.5);
   color: var(--text);

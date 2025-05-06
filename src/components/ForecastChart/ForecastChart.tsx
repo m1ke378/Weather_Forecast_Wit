@@ -28,7 +28,7 @@ ChartJS.register(
 
 export const options = {
   responsive: true,
-  maintainAspectRatio: true,
+  maintainAspectRatio: false,
   scales: {
     y: {
       ticks: {
@@ -52,6 +52,11 @@ export const options = {
       border: {
         display: false,
       },
+    },
+  },
+  layout: {
+    padding: {
+      top: 10, // increase until labels are not cut
     },
   },
   plugins: {

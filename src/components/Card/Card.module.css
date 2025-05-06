@@ -1,0 +1,10 @@
+.card {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.1)
+  );
+  border-radius: 20px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}

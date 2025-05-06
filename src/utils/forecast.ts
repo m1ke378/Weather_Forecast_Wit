@@ -47,34 +47,37 @@ export function getWeekday(dayNumber: number): string {
   return weekdays[dayNumber];
 }
 
-export function getAverageTemp(
-  list: ForecastItem[],
-  code: "avg" | "min" | "max"
-) {
-  const temps = list.map((dt) => {
-    switch (code) {
-      case "avg":
-        return dt.main.temp;
-      case "min":
-        return dt.main.temp_min;
-      case "max":
-        return dt.main.temp_max;
-      default:
-        return dt.main.temp;
-    }
-  });
-  const avg = temps.reduce((sum, t) => sum + t, 0) / temps.length;
-  return parseFloat(avg.toFixed(1));
-}
-
 /**
- * getAverageDayCondition returns the avg weather for a given day based on the 8 entries available.
+ * getAverageDayCondition / getAverageDayIcon returns the avg weather/icon for a given day based on the 8 entries available.
  *
  *
  * @param dayForecast - The list of entries for a given day
- * @returns - The avg value (Clouds, Rain, Clear, etc...)
+ * @returns - The avg value (Clouds, Rain, Clear, etc... / 10d.png, etc...  )
  *
  */
+
+export function getAverageDayIcon(dayForecast: ForecastItem[]): string {
+  const counts: Record<string, number> = {};
+
+  for (const entry of dayForecast) {
+    const icon = entry.weather?.[0]?.icon;
+    if (icon) {
+      counts[icon] = (counts[icon] || 0) + 1;
+    }
+  }
+
+  let maxIcon = null;
+  let maxCount = 0;
+
+  for (const icon in counts) {
+    if (counts[icon] > maxCount) {
+      maxIcon = icon;
+      maxCount = counts[icon];
+    }
+  }
+
+  return maxIcon || "Unknown";
+}
 
 export function getAverageDayCondition(dayForecast: ForecastItem[]): string {
   const counts: Record<string, number> = {};
@@ -97,6 +100,13 @@ export function getAverageDayCondition(dayForecast: ForecastItem[]): string {
   }
 
   return maxCondition || "Unknown";
+}
+
+export function getAverageTemp(entries: any[]): number {
+  if (!entries || entries.length === 0) return 0;
+
+  const total = entries.reduce((sum, entry) => sum + entry.main.temp, 0);
+  return Math.round(total / entries.length);
 }
 
 /**

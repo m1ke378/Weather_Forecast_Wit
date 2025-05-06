@@ -1,6 +1,11 @@
-.titleWrapper {
-  animation: slideUp 0.7 ease-in-out;
-  text-align: center;
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  width: 90vw;
+  max-width: var(--max-width);
+  min-width: var(--min-width);
 }
 
 .forecastContainer {
@@ -8,4 +13,41 @@
   gap: 0.2rem;
   justify-content: space-between;
   overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.firstTitleWrapper {
+  display: flex;
+  gap: "1rem";
+  justify-content: space-between;
+  align-items: center;
+}
+
+.formWrapper {
+  position: relative;
+}
+
+.backButton {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 1;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chartWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2rem;
 }

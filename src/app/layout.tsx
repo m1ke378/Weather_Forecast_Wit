@@ -29,6 +29,10 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AnimatePresence>{children}</AnimatePresence>
       </body>
+      <footer>
+        <p>Powered by OpenWeatherMap | OpenStreetMap | Leaflet</p>
+        <p>Developed by Miguel Saraiva</p>
+      </footer>
     </html>
   );
 }

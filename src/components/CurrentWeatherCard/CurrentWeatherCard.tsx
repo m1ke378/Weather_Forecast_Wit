@@ -17,6 +17,7 @@ export default function CurrentWeatherCard({
   weatherData: WeatherData;
   unit: "metric" | "imperial";
 }) {
+  console.log("WeatherData: ", weatherData);
   const weekday = getWeekday(new Date(weatherData.dt * 1000).getDay());
   const description =
     weatherData.weather[0].description.charAt(0).toUpperCase() +
@@ -80,7 +81,9 @@ export default function CurrentWeatherCard({
           }}
         >
           <FontAwesomeIcon icon={faWind} />
-          <span>{weatherData.wind.speed}km/h</span>
+          <span>
+            {`${weatherData.wind.speed} ${unit === "metric" ? "m/s" : "mph"}`}
+          </span>
           <span>
             <FontAwesomeIcon
               icon={faArrowUp}
@@ -104,7 +107,11 @@ export default function CurrentWeatherCard({
           }}
         >
           <FontAwesomeIcon icon={faEye} />
-          <span>{weatherData.visibility}m</span>
+          <span>{`${
+            weatherData.visibility > 1000
+              ? weatherData.visibility / 1000
+              : weatherData.visibility
+          } ${unit === "metric" ? "km" : "mi"}`}</span>
         </div>
       </div>
     </div>

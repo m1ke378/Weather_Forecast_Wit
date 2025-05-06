@@ -10,14 +10,43 @@ if (!API_KEY) {
   throw new Error("API key is not defined.");
 }
 
+const ColorScale = ({ unit }: { unit: "imperial" | "metric" }) => {
+  return (
+    <div className={styles.colorScaleContainer}>
+      <div className={styles.colorGradient}></div>
+      <div className={styles.colorScaleLegend}>
+        {unit === "metric" ? (
+          <>
+            <span>-40°</span>
+            <span>0°</span>
+            <span>20°</span>
+            <span>40°</span>
+            <span>60°</span>
+          </>
+        ) : (
+          <>
+            <span>-40°</span>
+            <span>32°</span>
+            <span>68°</span>
+            <span>104°</span>
+            <span>140°</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default function WeatherMap({
   centerLat,
   centerLon,
   zoom,
+  unit,
 }: {
   centerLat: number;
   centerLon: number;
   zoom: number;
+  unit: "imperial" | "metric";
 }) {
   const { tileX, tileY } = convertToTileCoordenates(centerLat, centerLon, zoom);
 
@@ -31,7 +60,7 @@ export default function WeatherMap({
         dragging={false}
         doubleClickZoom={false}
         zoomControl={false}
-        attributionControl={true}
+        attributionControl={false}
       >
         <TileLayer
           url={`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`}
@@ -43,23 +72,9 @@ export default function WeatherMap({
           opacity={0.5}
         />
       </MapContainer>
-      <ColorScale />
-    </div>
-  );
-}
-
-const ColorScale = () => {
-  return (
-    <div className={styles.colorScaleContainer}>
-      <div className={styles.colorGradient}></div>
-      <div className={styles.colorScaleLegend}>
-        <span>-40</span>
-        <span>0</span>
-        <span>20</span>
-
-        <span>40</span>
-        <span>60</span>
+      <div>
+        <ColorScale unit={unit} />
       </div>
     </div>
   );
-};
+}

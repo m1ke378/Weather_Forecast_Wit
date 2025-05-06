@@ -13,8 +13,13 @@ import AnimatedIcon from "@/components/AnimatedIcon";
 import HighlightedIcon from "@/components/HighlightedIcon/HighlightedIcon";
 import { AnimatePresence, motion } from "motion/react";
 import dynamic from "next/dynamic";
+import Card from "@/components/Card/Card";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import UnitToggle from "@/components/UnitToggle/UnitToggle";
+import Intro from "@/components/Intro/Intro";
 
-// Disable ssr fo leaflet map
+// Disable SSR of leaflet map
 const WeatherMap = dynamic(
   () => import("../components/WeatherMap/WeatherMap"),
   {
@@ -52,42 +57,53 @@ export default function Home() {
     }
   }, [selectedDayKey, groupedForecast]);
 
-  const fetchWeather = async (lat: number, lon: number) => {
-    // Fetch the current weather from OpenWeatherMap API
-    await axios
-      .get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
-      )
-      .then((res) => {
-        console.log("Current Weather data: ", res.data);
-        setCurrentWeather(res.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching current weather:", err.message);
-        throw new Error(
-          "Failed to fetch current weather. Please try again later."
-        );
-      });
+  useEffect(() => {
+    if (currentWeather) {
+      const { lat, lon } = currentWeather.coord;
+      fetchWeather(lat, lon);
+    }
+  }, [unit]);
 
-    // Fetch the weather forecats from OpenWeatherMap API
-    await axios
-      .get(
+  const fetchWeather = async (lat: number, lon: number) => {
+    try {
+      const currentRes = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
+      );
+      const forecastRes = await axios.get(
         `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
-      )
-      .then((res) => {
-        const groupedData = groupForecastByDay(res.data.list);
-        setGroupedForecast(groupedData);
-        const firstKey = Object.keys(groupedData)[0];
-        setSelectedDayKey(firstKey);
-        console.log("Grouped data: ", groupedData);
-      })
-      .catch((err) => {
-        console.error("Error fetching weather forecast:", err.message);
-        throw new Error(
-          "Failed to fetch weather forecast. Please try again later."
-        );
-      });
-    setIsSearching(false);
+      );
+
+      setCurrentWeather(currentRes.data);
+      const groupedData = groupForecastByDay(forecastRes.data.list);
+      setGroupedForecast(groupedData);
+      if (!selectedDayKey) setSelectedDayKey(Object.keys(groupedData)[0]);
+      setIsSearching(false);
+    } catch (err: any) {
+      console.error("Error fetching weather:", err.message);
+      throw new Error("Failed to fetch weather data. Please try again later.");
+    }
+  };
+
+  const getChartData = () => {
+    if (!selectedDayKey || !groupedForecast) return [];
+
+    const dayKeys = Object.keys(groupedForecast);
+    const firstKey = dayKeys[0];
+    const lastKey = dayKeys[dayKeys.length - 1];
+    const maxEntriesPerDay = 8;
+
+    if (selectedDayKey === firstKey) {
+      const current = groupedForecast[firstKey];
+      const next = groupedForecast[dayKeys[1]] || [];
+      return current.concat(next.slice(0, maxEntriesPerDay - current.length));
+    } else if (selectedDayKey === lastKey) {
+      const current = groupedForecast[lastKey];
+      const prev = groupedForecast[dayKeys[dayKeys.length - 2]] || [];
+      const missing = maxEntriesPerDay - current.length;
+      return (missing > 0 ? prev.slice(-missing) : []).concat(current);
+    }
+
+    return groupedForecast[selectedDayKey];
   };
 
   const handleEraseState = () => {
@@ -100,98 +116,69 @@ export default function Home() {
   return (
     <main>
       <AnimatedBackground dynamicBackground={dynamicBackground} />
-      <AnimatePresence>
-        {isSearching && (
-          <motion.div
-            key="intro"
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95, height: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{
-              overflow: "hidden",
-              display: "flex",
-              flexDirection: "column",
-              gap: "2rem",
-              alignItems: "center",
-              marginTop: "10vh",
-            }}
-          >
-            <AnimatedIcon>
-              <HighlightedIcon
-                src={`https://openweathermap.org/img/wn/10d@4x.png`}
-                alt="Animated weather icon"
-                blur={20}
-                height={200}
-              />
-            </AnimatedIcon>
-            <div className={styles.titleWrapper}>
-              <h1>Weather</h1>
-              <h2>Forecast</h2>
-              <br />
-              <p>5 day weather forecast for any city in the world</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <AnimatePresence>{isSearching && <Intro />}</AnimatePresence>
       <motion.div
         layout
         initial={{ y: 30, opacity: 0 }}
-        animate={{
-          y: 0,
-          opacity: 1,
-        }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
+        className={styles.formWrapper}
       >
-        <Input
-          fetchWeather={fetchWeather}
-          handleEraseState={handleEraseState}
-          isSearching={isSearching}
-        />
+        {!isSearching && (
+          <button
+            className={styles.backButton}
+            onClick={() => {
+              handleEraseState();
+            }}
+          >
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </button>
+        )}
+        <Input fetchWeather={fetchWeather} isSearching={isSearching} />
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "2rem",
-          width: "90vw",
-          maxWidth: "500px",
-        }}
-      >
-        {currentWeather && (
+      {currentWeather && groupedForecast && selectedDayKey && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
+          className={styles.layout}
+        >
           <>
-            <CurrentWeatherCard weatherData={currentWeather} unit={unit} />
+            <div className={styles.firstTitleWrapper}>
+              <h3>Current Weather</h3>
+              <div className={styles.unitToggle}>
+                <UnitToggle unit={unit} setUnit={setUnit} />
+              </div>
+            </div>
+            <Card>
+              <CurrentWeatherCard weatherData={currentWeather} unit={unit} />
+            </Card>
             <WeatherMap
               centerLat={currentWeather.coord.lat}
               centerLon={currentWeather.coord.lon}
               zoom={10}
+              unit={unit}
             />
+            <h3>Week forecast</h3>
+            <Card>
+              <div className={styles.chartWrapper}>
+                <ForecastChart chartData={getChartData()} />
+                <div className={styles.forecastContainer}>
+                  {Object.keys(groupedForecast).map((dayKey) => (
+                    <ForecastDayCard
+                      key={dayKey}
+                      weatherData={groupedForecast[dayKey]}
+                      onClick={() => setSelectedDayKey(dayKey)}
+                      selected={selectedDayKey === dayKey}
+                    />
+                  ))}
+                </div>
+              </div>
+            </Card>
           </>
-        )}
-
-        {groupedForecast && selectedDayKey && (
-          <>
-            <ForecastChart chartData={groupedForecast[selectedDayKey]} />
-            <div className={styles.forecastContainer}>
-              {Object.keys(groupedForecast).map((dayKey) => {
-                return (
-                  <ForecastDayCard
-                    key={dayKey}
-                    weatherData={groupedForecast[dayKey]}
-                    onClick={() => setSelectedDayKey(dayKey)}
-                    selected={selectedDayKey === dayKey}
-                  />
-                );
-              })}
-            </div>
-          </>
-        )}
-      </motion.div>
+        </motion.div>
+      )}
     </main>
   );
 }

@@ -6,6 +6,8 @@
   border-radius: 10px;
   padding: 0.7rem;
   transition: all 0.3s ease-in-out;
+  flex: 1;
+  min-width: 80px;
 }
 
 .forecastDayCard.selected {
