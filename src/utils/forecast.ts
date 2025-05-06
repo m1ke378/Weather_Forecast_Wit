@@ -76,7 +76,7 @@ export function getAverageTemp(
  *
  */
 
-export function getAverageDayCondition(dayForecast: ForecastItem[]) {
+export function getAverageDayCondition(dayForecast: ForecastItem[]): string {
   const counts: Record<string, number> = {};
 
   for (const entry of dayForecast) {
@@ -97,4 +97,29 @@ export function getAverageDayCondition(dayForecast: ForecastItem[]) {
   }
 
   return maxCondition || "Unknown";
+}
+
+/**
+ * convertToTileCoordenates converts earth coordenates (lat, lon) to a 256x256 pixel tile map coordenates.
+ *
+ *
+ * @param lat - latitude
+ * @param lon - longitude
+ * @param zoom - desired room
+ * @returns - Object {X coordenate, Y coordenate}
+ *
+ */
+
+export function convertToTileCoordenates(
+  lat: number,
+  lon: number,
+  zoom: number
+): { tileX: number; tileY: number } {
+  const latRad = (lat * Math.PI) / 180;
+  const n = 2 ** zoom;
+  const tileX = Math.floor(((lon + 180) / 360) * n);
+  const tileY = Math.floor(
+    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
+  );
+  return { tileX, tileY };
 }

@@ -12,6 +12,15 @@ import ForecastDayCard from "@/components/ForecastDayCard/ForecastDayCard";
 import AnimatedIcon from "@/components/AnimatedIcon";
 import HighlightedIcon from "@/components/HighlightedIcon/HighlightedIcon";
 import { AnimatePresence, motion } from "motion/react";
+import dynamic from "next/dynamic";
+
+// Disable ssr fo leaflet map
+const WeatherMap = dynamic(
+  () => import("../components/WeatherMap/WeatherMap"),
+  {
+    ssr: false,
+  }
+);
 
 const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 if (!API_KEY) {
@@ -106,6 +115,7 @@ export default function Home() {
               flexDirection: "column",
               gap: "2rem",
               alignItems: "center",
+              marginTop: "10vh",
             }}
           >
             <AnimatedIcon>
@@ -154,8 +164,16 @@ export default function Home() {
         }}
       >
         {currentWeather && (
-          <CurrentWeatherCard weatherData={currentWeather} unit={unit} />
+          <>
+            <CurrentWeatherCard weatherData={currentWeather} unit={unit} />
+            <WeatherMap
+              centerLat={currentWeather.coord.lat}
+              centerLon={currentWeather.coord.lon}
+              zoom={10}
+            />
+          </>
         )}
+
         {groupedForecast && selectedDayKey && (
           <>
             <ForecastChart chartData={groupedForecast[selectedDayKey]} />
