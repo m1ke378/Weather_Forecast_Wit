@@ -72,7 +72,7 @@ export default function Home() {
   const fetchWeather = async (lat: number, lon: number) => {
     try {
       const currentRes = await axios.get(
-        `https://api.openweathemap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
       );
       const forecastRes = await axios.get(
         `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
