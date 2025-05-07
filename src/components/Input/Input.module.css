@@ -31,6 +31,11 @@
   opacity: 0.8;
 }
 
+.cityInput:disabled {
+  color: var(--text);
+  opacity: 0.8;
+}
+
 .cityInputWrapperDisabled {
   background-color: transparent;
   border: solid 2px transparent;
