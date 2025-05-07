@@ -2,7 +2,10 @@
 import CurrentWeatherCard from "@/components/CurrentWeatherCard/CurrentWeatherCard";
 import styles from "./page.module.css";
 import Input from "@/components/Input/Input";
-import { getAverageDayCondition, groupForecastByDay } from "@/utils/forecast";
+import {
+  getAverageWeatherCondition,
+  groupForecastByDay,
+} from "@/utils/forecast";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import ForecastChart from "@/components/ForecastChart/ForecastChart";
@@ -44,7 +47,7 @@ export default function Home() {
 
   useEffect(() => {
     if (selectedDayKey && groupedForecast) {
-      const weatherCondition = getAverageDayCondition(
+      const weatherCondition = getAverageWeatherCondition(
         groupedForecast[selectedDayKey]
       );
 

@@ -1,6 +1,7 @@
 import {
-  getAverageDayIcon,
-  getAverageTemp,
+  getAverageWeatherIcon,
+  getMaxTemp,
+  getMinTemp,
   getWeekday,
 } from "@/utils/forecast";
 import { WeatherData } from "@/utils/types";
@@ -27,7 +28,7 @@ export default function ForecastDayCard({
     >
       <h4>{weekday}</h4>
       <img
-        src={`https://openweathermap.org/img/wn/${getAverageDayIcon(
+        src={`https://openweathermap.org/img/wn/${getAverageWeatherIcon(
           weatherData
         ).substring(0, 2)}d.png`}
         alt={
@@ -35,8 +36,9 @@ export default function ForecastDayCard({
             .description
         }
       />
-      <div>
-        <p>{getAverageTemp(weatherData)}°</p>
+      <div className={styles.tempGroup}>
+        <p>{getMinTemp(weatherData)}°</p>
+        <p>{getMaxTemp(weatherData)}°</p>
       </div>
     </div>
   );
