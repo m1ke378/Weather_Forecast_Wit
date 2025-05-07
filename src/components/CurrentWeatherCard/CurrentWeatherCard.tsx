@@ -65,11 +65,11 @@ export default function CurrentWeatherCard({
         </div>
         <div className={styles.detailItem}>
           <FontAwesomeIcon icon={faEye} />
-          <span>{`${
-            weatherData.visibility > 1000
-              ? weatherData.visibility / 1000
-              : weatherData.visibility
-          } ${unit === "metric" ? "km" : "mi"}`}</span>
+          <span>
+            {weatherData.visibility > 1000
+              ? `${weatherData.visibility / 1000} km`
+              : `${weatherData.visibility} m`}
+          </span>
         </div>
       </div>
     </div>
