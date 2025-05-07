@@ -101,6 +101,7 @@ export default function ForecastChart({ chartData }: { chartData: any }) {
 
           return gradient;
         },
+        borderColor: "transparent",
       },
     ],
   };
