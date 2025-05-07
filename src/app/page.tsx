@@ -172,7 +172,7 @@ export default function Home() {
               zoom={10}
               unit={unit}
             />
-            <h3>Week forecast</h3>
+            <h3>Week Forecast</h3>
             <Card>
               <div className={styles.chartWrapper}>
                 <ForecastChart chartData={getChartData()} />
