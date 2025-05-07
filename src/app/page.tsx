@@ -21,6 +21,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import UnitToggle from "@/components/UnitToggle/UnitToggle";
 import Intro from "@/components/Intro/Intro";
+import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 
 // Disable SSR of leaflet map
 const WeatherMap = dynamic(
@@ -36,6 +37,7 @@ if (!API_KEY) {
 }
 
 export default function Home() {
+  const [error, setError] = useState<string | null>(null);
   const [unit, setUnit] = useState<"metric" | "imperial">("metric");
   const [groupedForecast, setGroupedForecast] = useState<any>(null);
   const [currentWeather, setCurrentWeather] = useState<any>(null);
@@ -70,7 +72,7 @@ export default function Home() {
   const fetchWeather = async (lat: number, lon: number) => {
     try {
       const currentRes = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
+        `https://api.openweathemap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
       );
       const forecastRes = await axios.get(
         `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${unit}&appid=${API_KEY}`
@@ -83,7 +85,11 @@ export default function Home() {
       setIsSearching(false);
     } catch (err: any) {
       console.error("Error fetching weather:", err.message);
-      throw new Error("Failed to fetch weather data. Please try again later.");
+      setError("Failed to fetch weather data. Please try again.");
+      setTimeout(() => {
+        setError("");
+      }, 4000);
+      throw new Error("Failed to fetch weather data.");
     }
   };
 
@@ -138,6 +144,9 @@ export default function Home() {
           </button>
         )}
         <Input fetchWeather={fetchWeather} isSearching={isSearching} />
+        <AnimatePresence>
+          {error && <ErrorMessage message={error} />}
+        </AnimatePresence>
       </motion.div>
 
       {currentWeather && groupedForecast && selectedDayKey && (
