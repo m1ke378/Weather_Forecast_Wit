@@ -5,16 +5,11 @@ import styles from "./UnitToggle.module.css";
 interface UnitToggleProps {
   unit: "metric" | "imperial";
   setUnit: (unit: "metric" | "imperial") => void;
-  className?: string;
 }
 
-export default function UnitToggle({
-  unit,
-  setUnit,
-  className,
-}: UnitToggleProps) {
+export default function UnitToggle({ unit, setUnit }: UnitToggleProps) {
   return (
-    <div className={`${styles.switchContainer} ${className}`}>
+    <div className={styles.switchContainer}>
       <motion.div
         className={styles.slider}
         layout

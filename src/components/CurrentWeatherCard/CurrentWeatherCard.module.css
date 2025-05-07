@@ -3,3 +3,46 @@
   flex-direction: column;
   gap: 2rem;
 }
+
+.topSection {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.iconTempGroup {
+  display: flex;
+  align-items: center;
+}
+
+.tempGroup {
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+}
+
+.temp {
+  font-size: 50px;
+  font-weight: 600;
+}
+
+.descriptionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: right;
+  padding-right: 0.8rem;
+}
+
+.detailsGroup {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: space-between;
+  padding-inline: 1rem;
+}
+
+.detailItem {
+  display: flex;
+  gap: 0.5rem;
+}

@@ -10,14 +10,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { getWeekday } from "@/utils/forecast";
 
+interface CurrentWeatherCardProps {
+  weatherData: WeatherData;
+  unit: "metric" | "imperial";
+}
+
 export default function CurrentWeatherCard({
   weatherData,
   unit,
-}: {
-  weatherData: WeatherData;
-  unit: "metric" | "imperial";
-}) {
-  console.log("WeatherData: ", weatherData);
+}: CurrentWeatherCardProps) {
   const weekday = getWeekday(new Date(weatherData.dt * 1000).getDay());
   const description =
     weatherData.weather[0].description.charAt(0).toUpperCase() +
@@ -25,61 +26,28 @@ export default function CurrentWeatherCard({
 
   return (
     <div className={styles.currentWeatherCard}>
-      <div
-        style={{
-          display: "flex",
-          gap: "2rem",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>
+      <div className={styles.topSection}>
+        <div className={styles.iconTempGroup}>
           <HighlightedIcon
             src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
             alt={weatherData.weather[0].description}
             blur={5}
             height={100}
           />
-          <div
-            style={{
-              display: "flex",
-              gap: ".8rem",
-              alignItems: "baseline",
-            }}
-          >
-            <span style={{ fontSize: "50px", fontWeight: "600" }}>
+          <div className={styles.tempGroup}>
+            <span className={styles.temp}>
               {Math.round(weatherData.main.temp)}
             </span>
             <span>{unit === "metric" ? "°C" : "°F"}</span>
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: ".8rem",
-            textAlign: "right",
-            paddingRight: ".8rem",
-          }}
-        >
+        <div className={styles.descriptionGroup}>
           <h3>{weekday}</h3>
           <div>{description}</div>
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          gap: ".8rem",
-          justifyContent: "space-between",
-          paddingInline: "1rem",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: ".5rem",
-          }}
-        >
+      <div className={styles.detailsGroup}>
+        <div className={styles.detailItem}>
           <FontAwesomeIcon icon={faWind} />
           <span>
             {`${weatherData.wind.speed} ${unit === "metric" ? "m/s" : "mph"}`}
@@ -91,21 +59,11 @@ export default function CurrentWeatherCard({
             />
           </span>
         </div>
-        <div
-          style={{
-            display: "flex",
-            gap: ".5rem",
-          }}
-        >
+        <div className={styles.detailItem}>
           <FontAwesomeIcon icon={faCloud} />
           <span>{weatherData.clouds.all}%</span>
         </div>
-        <div
-          style={{
-            display: "flex",
-            gap: ".5rem",
-          }}
-        >
+        <div className={styles.detailItem}>
           <FontAwesomeIcon icon={faEye} />
           <span>{`${
             weatherData.visibility > 1000

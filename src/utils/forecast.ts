@@ -1,9 +1,7 @@
-interface ForecastItem {
-  [key: string]: any;
-}
+import { WeatherData } from "@/utils/types";
 
 type GroupedForecast = {
-  [date: string]: ForecastItem[];
+  [date: string]: WeatherData[];
 };
 
 /**
@@ -22,7 +20,7 @@ type GroupedForecast = {
  * }
  */
 
-export function groupForecastByDay(list: ForecastItem[]): GroupedForecast {
+export function groupForecastByDay(list: WeatherData[]): GroupedForecast {
   return list.reduce((acc: GroupedForecast, item) => {
     const date = item.dt_txt.split(" ")[0]; // "YYYY-MM-DD"
     if (!acc[date]) {
@@ -56,7 +54,7 @@ export function getWeekday(dayNumber: number): string {
  *
  */
 
-export function getAverageDayIcon(dayForecast: ForecastItem[]): string {
+export function getAverageDayIcon(dayForecast: WeatherData[]): string {
   const counts: Record<string, number> = {};
 
   for (const entry of dayForecast) {
@@ -79,7 +77,7 @@ export function getAverageDayIcon(dayForecast: ForecastItem[]): string {
   return maxIcon || "Unknown";
 }
 
-export function getAverageDayCondition(dayForecast: ForecastItem[]): string {
+export function getAverageDayCondition(dayForecast: WeatherData[]): string {
   const counts: Record<string, number> = {};
 
   for (const entry of dayForecast) {
@@ -102,34 +100,9 @@ export function getAverageDayCondition(dayForecast: ForecastItem[]): string {
   return maxCondition || "Unknown";
 }
 
-export function getAverageTemp(entries: any[]): number {
+export function getAverageTemp(entries: WeatherData[]): number {
   if (!entries || entries.length === 0) return 0;
 
   const total = entries.reduce((sum, entry) => sum + entry.main.temp, 0);
   return Math.round(total / entries.length);
-}
-
-/**
- * convertToTileCoordenates converts earth coordenates (lat, lon) to a 256x256 pixel tile map coordenates.
- *
- *
- * @param lat - latitude
- * @param lon - longitude
- * @param zoom - desired room
- * @returns - Object {X coordenate, Y coordenate}
- *
- */
-
-export function convertToTileCoordenates(
-  lat: number,
-  lon: number,
-  zoom: number
-): { tileX: number; tileY: number } {
-  const latRad = (lat * Math.PI) / 180;
-  const n = 2 ** zoom;
-  const tileX = Math.floor(((lon + 180) / 360) * n);
-  const tileY = Math.floor(
-    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
-  );
-  return { tileX, tileY };
 }

@@ -22,7 +22,7 @@ export default function Intro() {
           height={200}
         />
       </AnimatedIcon>
-      <div style={{ textAlign: "center" }}>
+      <div className={styles.introText}>
         <h1>Weather</h1>
         <h2>Forecast</h2>
         <br />

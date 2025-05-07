@@ -1,5 +1,4 @@
 import React from "react";
-import styles from "./ForecastChart.module.css";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -56,7 +55,7 @@ export const options = {
   },
   layout: {
     padding: {
-      top: 10, // increase until labels are not cut
+      top: 10,
     },
   },
   plugins: {
@@ -68,7 +67,7 @@ export const options = {
       font: {
         weight: "bold" as "bold",
       },
-      formatter: Math.round,
+      formatter: (value: number) => `${Math.round(value)}°`,
       padding: 4,
       backgroundColor: "rgba(255,255,255,1)",
       borderRadius: 4,

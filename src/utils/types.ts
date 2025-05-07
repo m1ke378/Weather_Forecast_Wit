@@ -1,5 +1,6 @@
 export type WeatherData = {
   dt: number;
+  dt_txt: string;
   main: {
     temp: number;
     feels_like: number;

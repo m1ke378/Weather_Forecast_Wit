@@ -1,14 +1,16 @@
+interface HighlightedIconProps {
+  src: string;
+  alt: string;
+  blur: number;
+  height: number;
+}
+
 export default function HighlightedIcon({
   src,
   alt,
   blur,
   height,
-}: {
-  src: string;
-  alt: string;
-  blur: number;
-  height: number;
-}) {
+}: HighlightedIconProps) {
   return (
     <div
       style={{

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 
 export default function AnimatedBackground({
   dynamicBackground,
@@ -18,6 +18,6 @@ export default function AnimatedBackground({
         zIndex: -1,
         background: dynamicBackground,
       }}
-    ></motion.div>
+    />
   );
 }
