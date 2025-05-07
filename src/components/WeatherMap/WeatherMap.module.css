@@ -1,7 +1,7 @@
 .mapContainer {
   height: 300px;
   width: 100%;
-  background-color: aqua;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   opacity: 0.8;
   box-shadow: var(--shadow);
@@ -16,11 +16,12 @@
   height: 10px;
   background: linear-gradient(
     to right,
-    #135a9d,
-    #43e5f7,
-    #3fda59,
-    #e3bf3b,
-    #d23a3a
+    rgb(191, 59, 118),
+    rgba(32, 140, 236, 1),
+    rgba(35, 221, 221, 1),
+    rgba(194, 255, 40, 1),
+    rgba(255, 240, 40, 1),
+    rgba(252, 128, 20, 1)
   );
   border-radius: 5px;
   margin: 5px 0;

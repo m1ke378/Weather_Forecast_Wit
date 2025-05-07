@@ -30,18 +30,20 @@ export default function WeatherMap({
           {unit === "metric" ? (
             <>
               <span>-40°</span>
+              <span>-20°</span>
               <span>0°</span>
+              <span>10°</span>
               <span>20°</span>
-              <span>40°</span>
-              <span>60°</span>
+              <span>30°</span>
             </>
           ) : (
             <>
               <span>-40°</span>
+              <span>-4°</span>
               <span>32°</span>
+              <span>50°</span>
               <span>68°</span>
-              <span>104°</span>
-              <span>140°</span>
+              <span>86°</span>
             </>
           )}
         </div>
@@ -55,10 +57,6 @@ export default function WeatherMap({
         center={[centerLat, centerLon]}
         zoom={zoom}
         className={styles.mapContainer}
-        scrollWheelZoom={false}
-        dragging={false}
-        doubleClickZoom={false}
-        zoomControl={false}
         attributionControl={false}
       >
         <TileLayer
