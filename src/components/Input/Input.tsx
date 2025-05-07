@@ -33,6 +33,7 @@ export default function Input({
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 500);
   const [suggestions, setSuggestions] = useState<CityOption[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -42,6 +43,7 @@ export default function Input({
       }
 
       try {
+        setIsLoading(true);
         const response = await axios.get(
           `https://api.openweathermap.org/geo/1.0/direct?q=${debouncedQuery}&limit=5&appid=${API_KEY}`
         );
@@ -54,6 +56,7 @@ export default function Input({
           lon: item.lon,
         }));
         setSuggestions(cities);
+        setIsLoading(false);
       } catch (error) {
         console.error("City search failed", error);
         setSuggestions([]);
@@ -111,14 +114,14 @@ export default function Input({
               className={styles.cityInput}
               style={{
                 borderBottom:
-                  suggestions.length > 0 && query.length > 0
+                  debouncedQuery.length > 0 && query.length > 0 && !isLoading
                     ? "solid 1px rgba(255, 255, 255, 0.5)"
                     : "none",
               }}
               disabled={!isSearching}
             />
             <AnimatePresence>
-              {suggestions.length > 0 && query.length > 0 && (
+              {debouncedQuery.length > 0 && query.length > 0 && !isLoading && (
                 <motion.div
                   layout
                   key="dropdown"
@@ -133,19 +136,23 @@ export default function Input({
                   className={styles.dropdown}
                 >
                   <ul>
-                    {suggestions.map((city, index) => (
-                      <li
-                        key={index}
-                        onClick={() => {
-                          resetForm();
-                          handleSelect(city, setFieldValue);
-                        }}
-                      >
-                        {`${city.name}, ${city.countryCode}${
-                          city.state ? `, ${city.state}` : ""
-                        }`}
-                      </li>
-                    ))}
+                    {suggestions.length > 0 ? (
+                      suggestions.map((city, index) => (
+                        <li
+                          key={index}
+                          onClick={() => {
+                            resetForm();
+                            handleSelect(city, setFieldValue);
+                          }}
+                        >
+                          {`${city.name}, ${city.countryCode}${
+                            city.state ? `, ${city.state}` : ""
+                          }`}
+                        </li>
+                      ))
+                    ) : (
+                      <li className={styles.liDisabled}>No results found</li>
+                    )}
                   </ul>
                 </motion.div>
               )}
